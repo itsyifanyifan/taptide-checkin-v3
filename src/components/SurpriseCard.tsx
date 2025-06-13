@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock } from 'lucide-react';
 import ReactCanvasConfetti from 'react-canvas-confetti';
+import type { CreateTypes } from 'canvas-confetti';
 
 interface SurpriseCardProps {
   title: string;
@@ -23,6 +24,11 @@ const SurpriseCard: React.FC<SurpriseCardProps> = ({
   const [timeLeft, setTimeLeft] = useState<string>('');
   const [isExpired, setIsExpired] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [confettiInstance, setConfettiInstance] = useState<CreateTypes | null>(null);
+
+  const getConfettiInstance = useCallback(({ confetti }: { confetti: CreateTypes }) => {
+    setConfettiInstance(confetti);
+  }, []);
 
   useEffect(() => {
     if (revealedAt) {
@@ -52,6 +58,13 @@ const SurpriseCard: React.FC<SurpriseCardProps> = ({
 
   const handleReveal = () => {
     setShowConfetti(true);
+    if (confettiInstance) {
+      confettiInstance({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
     onReveal();
     setTimeout(() => setShowConfetti(false), 2000);
   };
@@ -117,10 +130,7 @@ const SurpriseCard: React.FC<SurpriseCardProps> = ({
 
       {showConfetti && (
         <ReactCanvasConfetti
-          fire={true}
-          particleCount={100}
-          spread={70}
-          origin={{ y: 0.6 }}
+          onInit={getConfettiInstance}
           style={{
             position: 'fixed',
             pointerEvents: 'none',
