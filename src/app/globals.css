@@ -1,8 +1,32 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* Brand Colors */
+  --primary: #6366f1;
+  --primary-light: #818cf8;
+  --primary-dark: #4f46e5;
+  
+  /* Accent Colors */
+  --sunset-pink: #ff6b6b;
+  --electric-orange: #ff9f1c;
+  --mint-green: #4ade80;
+  
+  /* Neutral Colors */
+  --gray-50: #f8fafc;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1e293b;
+  --gray-900: #0f172a;
 }
 
 @theme inline {
@@ -19,8 +43,64 @@
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  body {
+    @apply bg-gray-50 font-sans antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-poppins font-bold;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-2xl shadow-lg shadow-gray-200/50 overflow-hidden;
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-purple-600;
+  }
+
+  .badge {
+    @apply px-3 py-1 rounded-full text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply bg-gradient-to-r from-indigo-500/10 to-purple-500/10 text-indigo-700;
+  }
+
+  .progress-bar {
+    @apply h-2.5 rounded-full bg-gray-200 overflow-hidden;
+  }
+
+  .progress-bar-fill {
+    @apply h-full rounded-full bg-gradient-to-r from-primary-600 to-purple-600 transition-all duration-500 ease-out;
+  }
+
+  /* Animation Utilities */
+  .reveal-card {
+    @apply relative cursor-pointer transition-transform duration-300 ease-out;
+  }
+
+  .reveal-card:hover {
+    @apply transform scale-[1.02];
+  }
+
+  .reveal-card-overlay {
+    @apply absolute inset-0 bg-gradient-to-br from-primary-100 to-purple-100
+           flex flex-col items-center justify-center p-6 transition-opacity duration-300;
+  }
+
+  .reveal-card-content {
+    @apply opacity-0 transition-opacity duration-300;
+  }
+
+  .reveal-card.revealed .reveal-card-overlay {
+    @apply opacity-0 pointer-events-none;
+  }
+
+  .reveal-card.revealed .reveal-card-content {
+    @apply opacity-100;
+  }
 }
