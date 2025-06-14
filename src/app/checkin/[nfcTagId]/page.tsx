@@ -24,7 +24,7 @@ export default function CheckinPage({ params }: { params: { nfcTagId: string } }
     // Remove all non-digits
     const digits = value.replace(/\D/g, '');
     
-    // Format as (XXX)XXX-XXXX
+    // Format as (XXX)XXX-XXXX for display
     if (digits.length <= 3) {
       return `(${digits}`;
     } else if (digits.length <= 6) {
@@ -46,24 +46,41 @@ export default function CheckinPage({ params }: { params: { nfcTagId: string } }
     try {
       const validatedData = userSchema.parse(formData);
       
-      const response = await fetch('/api/checkin', {
+      // Convert phone number to +1XXXXXXXXXX format
+      const phoneNumber = '+1' + formData.phoneNumber.replace(/\D/g, '');
+      
+      // Use the current window location for the API URL
+      const apiUrl = '/api/checkin';
+      console.log('Making request to:', apiUrl);
+      console.log('Request body:', {
+        ...validatedData,
+        phoneNumber,
+        nfcTagId: params.nfcTagId,
+      });
+      
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...validatedData,
+          phoneNumber,
           nfcTagId: params.nfcTagId,
         }),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to check in');
+        const data = await response.json();
+        if (response.status === 404) {
+          throw new Error('This merchant is not registered in our system. Please contact the merchant.');
+        }
+        throw new Error(data.error || 'Failed to check in');
       }
 
       const data = await response.json();
       toast.success('Check-in successful!');
       router.push(`/rewards/${data.userId}`);
     } catch (error: any) {
+      console.error('Check-in error:', error);
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
       } else {

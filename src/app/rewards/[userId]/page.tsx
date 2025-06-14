@@ -20,7 +20,6 @@ interface Merchant {
     description: string;
     code: string;
   }>;
-  referringTo: Merchant[];
 }
 
 interface Reward {
@@ -35,7 +34,6 @@ export default function RewardsPage() {
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [referralMerchants, setReferralMerchants] = useState<Merchant[]>([]);
   const [revealedOffers, setRevealedOffers] = useState<Record<string, Date>>({});
   const [showCover, setShowCover] = useState(true);
 
@@ -73,19 +71,7 @@ export default function RewardsPage() {
           throw new Error(errorData.error || 'Failed to fetch rewards');
         }
         const data = await response.json();
-        
-        // Process referral merchants
-        const allReferrals = data.flatMap((reward: Reward) => {
-          return reward.merchant.referringTo || [];
-        });
-        
-        // Remove duplicates
-        const uniqueReferrals = allReferrals.filter((merchant: Merchant, index: number, self: Merchant[]) =>
-          index === self.findIndex((m: Merchant) => m.id === merchant.id)
-        );
-        
         setRewards(data);
-        setReferralMerchants(uniqueReferrals);
       } catch (err) {
         console.error('Error fetching rewards:', err);
         setError(err instanceof Error ? err.message : 'Failed to load rewards');

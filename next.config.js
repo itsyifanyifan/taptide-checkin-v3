@@ -1,10 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable static exports
-  output: 'standalone',
-  // Configure images if needed
+  // Remove standalone output for development
+  // output: 'standalone',
+  
+  // Configure images
   images: {
-    domains: ['localhost'],
+    domains: ['images.unsplash.com'],
   },
 };
 
